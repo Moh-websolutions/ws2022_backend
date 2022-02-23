@@ -55,15 +55,6 @@
       },
       "type": "richtext"
     },
-    "slug": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "type": "uid",
-      "targetField": "title"
-    },
     "gallery": {
       "type": "media",
       "multiple": true,
@@ -78,6 +69,20 @@
           "localized": true
         }
       }
+    },
+    "associate_casestudies": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::casestudy.casestudy"
+    },
+    "slug": {
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "type": "string",
+      "unique": true
     }
   }
 }
