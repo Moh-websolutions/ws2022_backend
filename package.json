@@ -16,8 +16,8 @@
     "@strapi/strapi": "4.1.12",
     "pg": "^8.7.1",
     "pg-connection-string": "^2.5.0",
-    "sqlite3": "5.0.2",
-    "strapi-plugin-comments": "^2.0.2"
+    "sqlite3": "^5.0.8",
+    "strapi-plugin-comments": "^1.0.4"
   },
   "author": {
     "name": "A Strapi developer"
