@@ -1,4 +1,5 @@
 module.exports = [
+
   'strapi::errors',
   {
     name: "strapi::security",
@@ -22,3 +23,5 @@ module.exports = [
   'strapi::favicon',
   'strapi::public',
 ];
+
+
