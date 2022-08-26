@@ -1,109 +1,32 @@
-name: Strapi Serverless
-description: Strapi is an open source Headless CMS built with NodeJS. Using Strapi you can design and publish your content consumed by your apps via API.
-logo: https://dev-to-uploads.s3.amazonaws.com/uploads/organization/profile_image/763/988af53b-5d7e-435a-98eb-dd4aff5299d2.png
-repo: https://github.com/microtica/templates/tree/master/strapi-serverless
+name: Import an existing app
+description: Import an existing app from your Git repository and deploy it on your Kubernetes cluster.
+logo: https://upload.wikimedia.org/wikipedia/commons/3/3f/Git_icon.svg
+repo: https://github.com/microtica/templates/tree/master/import-app
 
 inputs:
   properties:
-    CPU:
-      type: number
-      enum:
-        - 256
-        - 512
-        - 1024
-        - 2048
-        - 4096
-      default: 256
-      description: The number of CPU units reserved for the Strapi app
-    Memory:
-      type: number
-      enum:
-        - 512
-        - 1024
-        - 2048
-        - 3072
-        - 4096
-      default: 512
-      description: The amount (in MiB) of memory reserved for the Strapi app
-    DesiredReplicas:
-      type: number
-      default: 1
-      minimum: 0
-      maximum: 10
-      description: The number of Strapi applications running at the same time. The workload will be balanced between the apps.
-    DatabaseClient:
-      type: string
-      enum:
-        - sqlite
-        - postgres
-        - mysql
-      default: sqlite
     AppName:
       type: string
-      description: Unique name for your application
-      maxLength: 20
-      pattern: ^[A-Z][A-Za-z]*$
-      patternErrorMessage: "The app name can only contain letters and must start with an uppercase."
+      description: The name of the application. The name will be shown in the portal.
+      maxLength: 23
+      pattern: ^[a-zA-Z0-9]*$
+      patternErrorMessage: "The app name can contain only letters and numbers"
+    Port:
+      type: number
+      default: 80
+      description: The port on which the application is listening for requests.
   required:
-    - CPU
-    - Memory
-    - DesiredReplicas
-    - DatabaseClient
     - AppName
+    - Port
 
-infrastructure:
-  resources:
-    VPC{{AppName}}:
-      type: microtica-aws-vpc:latest
-      properties:
-        - key: natInstanceType
-          value: t2.micro
-    StrapiServerless{{AppName}}:
-      type: microtica-aws-strapi-serverless:latest
-      properties:
-        - key: VpcId
-          reference: VPC{{AppName}}.vpcId
-        - key: PrivateSubnet1Id
-          reference: VPC{{AppName}}.privateSubnet1
-        - key: PrivateSubnet2Id
-          reference: VPC{{AppName}}.privateSubnet2
-        - key: CPU
-          value: "{{CPU}}"
-        - key: Memory
-          value: "{{Memory}}"
-        - key: DesiredReplicas
-          value: "{{DesiredReplicas}}"
-        - key: DatabaseClient
-          value: "{{DatabaseClient}}"
-        - key: ImageUrl
-          reference: "StrapiApp{{AppName}}.ImageUrl"
-    ContainerRunner{{AppName}}:
-      type: microtica-aws-fargate:latest
-      properties:
-        - key: VpcId
-          reference: VPC{{AppName}}.vpcId
-        - key: PrivateSubnet1Id
-          reference: VPC{{AppName}}.privateSubnet1
-        - key: PrivateSubnet2Id
-          reference: VPC{{AppName}}.privateSubnet2
-        - key: PublicSubnet1Id
-          reference: VPC{{AppName}}.publicSubnet1
-        - key: PublicSubnet2Id
-          reference: VPC{{AppName}}.publicSubnet2
-        - key: CustomTaskDefinitionArn
-          reference: StrapiServerless{{AppName}}.TaskDefinitionArn
-        - key: ContainerPort
-          reference: StrapiServerless{{AppName}}.ContainerPort
-        - key: DesiredReplicas
-          reference: StrapiServerless{{AppName}}.DesiredReplicas
-        - key: CPU
-          value: "{{CPU}}"
-        - key: Memory
-          value: "{{Memory}}"
-        - key: StickySession
-          value: "false"
-    StrapiApp{{AppName}}:
-      source: git
-      properties:
-        - key: ImageUrl
-          value: "{{CONTAINER_REGISTRY_URL}}/microtica/strapi-app"
+service:
+  "{{AppName}}":
+    source: git
+    containerPort: "{{Port}}"
+    autoScaling:
+      minReplicas: 1
+      maxReplicas: 1
+      cpu: 1
+      maxCpu: 10
+      memory: 32
+      maxMemory: 64

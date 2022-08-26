@@ -1,19 +1,13 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "schema://microtica/comp.json",
-    "title": "Component Schema",
+    "$id": "schema://microtica/nextjs.json",
+    "title": "NextJS service schema",
     "type": "object",
     "properties": {
         "inputs": {
             "type": "object",
-            "properties": {
-                "ImageUrl": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "ImageUrl"
-            ]
+            "properties": {},
+            "required": []
         }
     },
     "additionalProperties": false
